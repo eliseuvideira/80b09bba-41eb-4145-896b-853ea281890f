@@ -1,0 +1,10 @@
+node_modules/
+dist/
+coverage/
+.claude/
+.cursor/
+.pnpm-store/
+*.log
+.DS_Store
+CLAUDE.md
+.env
