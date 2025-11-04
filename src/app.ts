@@ -75,7 +75,7 @@ export async function buildApp(config: Config): Promise<App> {
         channel.ack(message);
         console.log("Message processed and acked");
       } catch (error) {
-        console.error("Error processing message:", error);
+        console.error("Error processing message: ", error);
         channel.nack(message, false, false);
       } finally {
         inFlightMessages--;
