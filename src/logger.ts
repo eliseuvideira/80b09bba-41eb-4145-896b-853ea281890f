@@ -11,13 +11,7 @@ const wrapLogger = (pinoLogger: pino.Logger): LoggerType => {
         return;
       }
 
-      const transformedData = { ...data };
-      if ("error" in transformedData) {
-        transformedData.err = transformedData.error;
-        delete transformedData.error;
-      }
-
-      pinoLogger[level](transformedData, msg);
+      pinoLogger[level](data, msg);
     };
   };
 
@@ -35,15 +29,18 @@ const wrapLogger = (pinoLogger: pino.Logger): LoggerType => {
 };
 
 const build = async (env: Record<string, unknown>): Promise<LoggerType> => {
-  const pinoLogger = pino(
-    env.NODE_ENV === "development"
+  const pinoLogger = pino({
+    serializers: {
+      error: pino.stdSerializers.err,
+    },
+    ...(env.NODE_ENV === "development"
       ? {
           transport: {
             target: "pino-pretty",
           },
         }
-      : {},
-  );
+      : {}),
+  });
 
   return wrapLogger(pinoLogger);
 };
