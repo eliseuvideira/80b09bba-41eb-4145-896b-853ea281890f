@@ -5,7 +5,7 @@ import { noop } from "./functions/noop";
 import { sleep } from "./functions/sleep";
 import { handler, type MessageContext, type MessageHandler } from "./handler";
 
-type App = {
+export type App = {
   run: () => Promise<void>;
   stop: () => Promise<void>;
 };
