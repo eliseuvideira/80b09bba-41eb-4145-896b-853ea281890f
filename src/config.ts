@@ -1,12 +1,6 @@
 import { z } from "zod";
 
 const CONFIG_SCHEMA = z.object({
-  NODE_ENV: z.union([
-    z.literal("development"),
-    z.literal("production"),
-    z.literal("staging"),
-    z.literal("test"),
-  ]),
   RABBITMQ_URL: z.string().default("amqp://localhost"),
   RABBITMQ_QUEUE: z.string().default("queue_example"),
 });

@@ -63,7 +63,6 @@ describe("App Integration Tests", () => {
     const testQueue = `test-queue-${randomUUID()}`;
 
     const testConfig: Config = {
-      NODE_ENV: "test",
       RABBITMQ_URL: rabbitmqUrl,
       RABBITMQ_QUEUE: testQueue,
     };
@@ -92,7 +91,6 @@ describe("App Integration Tests", () => {
     const testQueue = `test-queue-${randomUUID()}`;
 
     const testConfig: Config = {
-      NODE_ENV: "test",
       RABBITMQ_URL: rabbitmqUrl,
       RABBITMQ_QUEUE: testQueue,
     };
@@ -131,7 +129,6 @@ describe("App Integration Tests", () => {
     const testQueue = `test-queue-${randomUUID()}`;
 
     const testConfig: Config = {
-      NODE_ENV: "test",
       RABBITMQ_URL: rabbitmqUrl,
       RABBITMQ_QUEUE: testQueue,
     };

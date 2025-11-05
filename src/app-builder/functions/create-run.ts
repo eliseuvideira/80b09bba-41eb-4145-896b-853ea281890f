@@ -9,7 +9,10 @@ export const createRun = (
   logger: Logger,
 ) => {
   return async () => {
-    const consumeResult = await state.channel.consume(queueName, wrappedHandler);
+    const consumeResult = await state.channel.consume(
+      queueName,
+      wrappedHandler,
+    );
     state.consumerTag = consumeResult.consumerTag;
     logger.info("Listening on queue", { queue: queueName });
   };
