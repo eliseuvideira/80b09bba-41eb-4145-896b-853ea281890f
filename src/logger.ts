@@ -28,6 +28,25 @@ const wrapLogger = (pinoLogger: pino.Logger): LoggerType => {
   };
 };
 
+const level = (level: unknown): pino.Level => {
+  switch (level) {
+    case "info":
+      return "info";
+    case "warn":
+      return "warn";
+    case "error":
+      return "error";
+    case "fatal":
+      return "fatal";
+    case "debug":
+      return "debug";
+    case "trace":
+      return "trace";
+    default:
+      return "info";
+  }
+};
+
 const build = async (env: Record<string, unknown>): Promise<LoggerType> => {
   const pinoLogger = pino({
     serializers: {
@@ -40,6 +59,7 @@ const build = async (env: Record<string, unknown>): Promise<LoggerType> => {
           },
         }
       : {}),
+    level: level(env.LOG_LEVEL),
   });
 
   return wrapLogger(pinoLogger);
