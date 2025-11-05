@@ -1,10 +1,12 @@
 import type { Message } from "amqplib";
+import type { Logger } from "../../types/Logger";
 import type { AppState } from "../types/AppState";
-import type { MessageContext, MessageHandler } from "../types/MessageHandler";
+import type { MessageHandler } from "../types/MessageHandler";
 import type { ErrorReply, SuccessReply } from "../types/Reply";
 
-export const withMessageHandling = (
-  handler: MessageHandler,
+export const withMessageHandling = <Context extends { logger: Logger }>(
+  handler: MessageHandler<Context>,
+  createContext: () => Context,
   state: AppState,
 ) => {
   return async (message: Message | null) => {
@@ -24,11 +26,7 @@ export const withMessageHandling = (
       const content = JSON.parse(message.content.toString());
       console.log("Received message:", JSON.stringify(content));
 
-      const ctx: MessageContext = {
-        logger: {
-          log: (...args: unknown[]) => console.log(...args),
-        },
-      };
+      const ctx = createContext();
 
       const result = await handler(content, ctx);
 

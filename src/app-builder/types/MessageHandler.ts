@@ -1,10 +1,6 @@
-export type MessageContext = {
-  logger: {
-    log: (...args: unknown[]) => void;
-  };
-};
+import type { Logger } from "../../types/Logger";
 
-export type MessageHandler = (
+export type MessageHandler<Context extends { logger: Logger } = { logger: Logger }> = (
   content: unknown,
-  ctx: MessageContext,
+  ctx: Context,
 ) => Promise<unknown>;
