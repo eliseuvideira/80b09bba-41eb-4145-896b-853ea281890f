@@ -1,7 +1,6 @@
 import { randomUUID } from "node:crypto";
 import amqplib from "amqplib";
-import { AppBuilder } from "../src/app";
-import { handler } from "../src/handler";
+import { App } from "../src/app";
 import type { Config } from "../src/config";
 
 function sleep(ms: number): Promise<void> {
@@ -67,11 +66,6 @@ describe("App Integration Tests", () => {
       RABBITMQ_QUEUE: testQueue,
     };
 
-    const App = AppBuilder.create(() => ({
-      queue: testQueue,
-      handler,
-    }));
-
     const app = await App.build(testConfig);
 
     const runPromise = app.run();
@@ -98,11 +92,6 @@ describe("App Integration Tests", () => {
       RABBITMQ_URL: rabbitmqUrl,
       RABBITMQ_QUEUE: testQueue,
     };
-
-    const App = AppBuilder.create(() => ({
-      queue: testQueue,
-      handler,
-    }));
 
     const app = await App.build(testConfig);
 
@@ -140,11 +129,6 @@ describe("App Integration Tests", () => {
       RABBITMQ_URL: rabbitmqUrl,
       RABBITMQ_QUEUE: testQueue,
     };
-
-    const App = AppBuilder.create(() => ({
-      queue: testQueue,
-      handler,
-    }));
 
     const app = await App.build(testConfig);
 
