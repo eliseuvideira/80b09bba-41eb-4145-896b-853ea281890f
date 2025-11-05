@@ -33,10 +33,6 @@ type AppState = {
   inFlightMessages: number;
 };
 
-type AppBuilder = {
-  build: (config: Config) => Promise<App>;
-};
-
 const withMessageHandling = (handler: MessageHandler, state: AppState) => {
   return async (message: Message | null) => {
     if (!message) {
@@ -112,12 +108,11 @@ const withMessageHandling = (handler: MessageHandler, state: AppState) => {
 };
 
 const createRun = (
-  handler: MessageHandler,
+  wrappedHandler: (message: Message | null) => Promise<void>,
   state: AppState,
   queueName: string,
 ) => {
   return async () => {
-    const wrappedHandler = withMessageHandling(handler, state);
     const consumeResult = await state.channel.consume(queueName, wrappedHandler);
     state.consumerTag = consumeResult.consumerTag;
     console.log(`Listening on queue: ${queueName}`);
@@ -147,33 +142,44 @@ const createStop = (state: AppState) => {
   };
 };
 
-const createAppBuilder = (handler: MessageHandler): AppBuilder => {
-  return {
-    async build(config: Config): Promise<App> {
-      const connection = await amqplib.connect(config.RABBITMQ_URL);
-      const channel = await connection.createChannel();
-      channel.on("close", () => {
-        console.log("Channel closed");
-      });
-      connection.on("close", () => {
-        console.log("Connection closed");
-      });
-      await channel.assertQueue(config.RABBITMQ_QUEUE, { durable: true });
+export const AppBuilder = {
+  create: (
+    define: (config: Config) => { queue: string; handler: MessageHandler },
+  ) => {
+    return {
+      async build(config: Config): Promise<App> {
+        const { queue, handler } = define(config);
 
-      const state: AppState = {
-        channel,
-        connection,
-        consumerTag: null,
-        isShuttingDown: false,
-        inFlightMessages: 0,
-      };
+        const connection = await amqplib.connect(config.RABBITMQ_URL);
+        const channel = await connection.createChannel();
+        channel.on("close", () => {
+          console.log("Channel closed");
+        });
+        connection.on("close", () => {
+          console.log("Connection closed");
+        });
+        await channel.assertQueue(queue, { durable: true });
 
-      return {
-        run: createRun(handler, state, config.RABBITMQ_QUEUE),
-        stop: createStop(state),
-      };
-    },
-  };
+        const state: AppState = {
+          channel,
+          connection,
+          consumerTag: null,
+          isShuttingDown: false,
+          inFlightMessages: 0,
+        };
+
+        const wrappedHandler = withMessageHandling(handler, state);
+
+        return {
+          run: createRun(wrappedHandler, state, queue),
+          stop: createStop(state),
+        };
+      },
+    };
+  },
 };
 
-export const App = createAppBuilder(handler);
+export const App = AppBuilder.create((config) => ({
+  queue: config.RABBITMQ_QUEUE,
+  handler,
+}));
