@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 import amqplib from "amqplib";
 import { App } from "../src/app";
 import type { Config } from "../src/config";
+import { Logger } from "../src/logger";
 
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -62,11 +63,13 @@ describe("App Integration Tests", () => {
     const testQueue = `test-queue-${randomUUID()}`;
 
     const testConfig: Config = {
+      NODE_ENV: "test",
       RABBITMQ_URL: rabbitmqUrl,
       RABBITMQ_QUEUE: testQueue,
     };
 
-    const app = await App.build(testConfig);
+    const logger = await Logger.build({ NODE_ENV: "test" });
+    const app = await App.build(testConfig, logger);
 
     const runPromise = app.run();
 
@@ -89,11 +92,13 @@ describe("App Integration Tests", () => {
     const testQueue = `test-queue-${randomUUID()}`;
 
     const testConfig: Config = {
+      NODE_ENV: "test",
       RABBITMQ_URL: rabbitmqUrl,
       RABBITMQ_QUEUE: testQueue,
     };
 
-    const app = await App.build(testConfig);
+    const logger = await Logger.build({ NODE_ENV: "test" });
+    const app = await App.build(testConfig, logger);
 
     const runPromise = app.run();
 
@@ -126,11 +131,13 @@ describe("App Integration Tests", () => {
     const testQueue = `test-queue-${randomUUID()}`;
 
     const testConfig: Config = {
+      NODE_ENV: "test",
       RABBITMQ_URL: rabbitmqUrl,
       RABBITMQ_QUEUE: testQueue,
     };
 
-    const app = await App.build(testConfig);
+    const logger = await Logger.build({ NODE_ENV: "test" });
+    const app = await App.build(testConfig, logger);
 
     const runPromise = app.run();
 

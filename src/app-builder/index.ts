@@ -12,21 +12,14 @@ export const AppBuilder = <Context extends { logger: Logger }>(
   define: (config: Config) => {
     queue: string;
     handler: MessageHandler<Context>;
-    createContext: () => Context;
   },
 ) => {
   return {
-    async build(config: Config): Promise<App> {
-      const { queue, handler, createContext } = define(config);
+    async build(config: Config, logger: Logger): Promise<App> {
+      const { queue, handler } = define(config);
 
       const connection = await amqplib.connect(config.RABBITMQ_URL);
       const channel = await connection.createChannel();
-      channel.on("close", () => {
-        console.log("Channel closed");
-      });
-      connection.on("close", () => {
-        console.log("Connection closed");
-      });
       await channel.assertQueue(queue, { durable: true });
 
       const state: AppState = {
@@ -37,11 +30,11 @@ export const AppBuilder = <Context extends { logger: Logger }>(
         inFlightMessages: 0,
       };
 
-      const wrappedHandler = withMessageHandling(handler, createContext, state);
+      const wrappedHandler = withMessageHandling(handler, logger, state);
 
       return {
-        run: createRun(wrappedHandler, state, queue),
-        stop: createStop(state),
+        run: createRun(wrappedHandler, state, queue, logger),
+        stop: createStop(state, logger),
       };
     },
   };

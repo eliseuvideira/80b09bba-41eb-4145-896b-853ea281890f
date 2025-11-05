@@ -1,6 +1,7 @@
 import dotenv from "dotenv";
 import { App } from "./app";
 import { Config } from "./config";
+import { Logger } from "./logger";
 
 const main = async (): Promise<void> => {
   dotenv.config({
@@ -8,12 +9,13 @@ const main = async (): Promise<void> => {
   });
 
   const config = await Config.build(process.env);
-  const app = await App.build(config);
+  const logger = await Logger.build(process.env);
+
+  const app = await App.build(config, logger);
 
   const shutdown = async (): Promise<void> => {
-    console.log("Shutting down...");
+    logger.info("Shutting down...");
     await app.stop();
-    process.exit(0);
   };
 
   process.on("SIGTERM", shutdown);
@@ -22,7 +24,8 @@ const main = async (): Promise<void> => {
   await app.run();
 };
 
-main().catch((error) => {
-  console.error("Fatal error:", error);
+main().catch(async (error) => {
+  const logger = await Logger.build(process.env);
+  logger.fatal("Fatal error", { error });
   process.exit(1);
 });
