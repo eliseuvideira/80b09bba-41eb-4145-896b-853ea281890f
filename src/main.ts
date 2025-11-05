@@ -1,12 +1,14 @@
 import dotenv from "dotenv";
-import { buildApp } from "./app";
-import { buildConfig } from "./config";
+import { App } from "./app";
+import { Config } from "./config";
 
 const main = async (): Promise<void> => {
-  dotenv.config();
+  dotenv.config({
+    quiet: true,
+  });
 
-  const config = buildConfig(process.env);
-  const app = await buildApp(config);
+  const config = await Config.build(process.env);
+  const app = await App.build(config);
 
   const shutdown = async (): Promise<void> => {
     console.log("Shutting down...");

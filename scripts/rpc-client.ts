@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-async function sendRpcRequest() {
+const sendRpcRequest = async () => {
   const rabbitmqUrl = process.env.RABBITMQ_URL || "amqp://localhost";
   const queueName = process.env.RABBITMQ_QUEUE || "queue_example";
 
@@ -54,7 +54,7 @@ async function sendRpcRequest() {
 
   await channel.close();
   await connection.close();
-}
+};
 
 sendRpcRequest().catch((error) => {
   console.error("Error:", error);

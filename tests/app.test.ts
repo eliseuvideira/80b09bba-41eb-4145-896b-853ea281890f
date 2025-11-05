@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import amqplib from "amqplib";
-import { buildApp } from "../src/app";
+import { App } from "../src/app";
 import type { Config } from "../src/config";
 
 function sleep(ms: number): Promise<void> {
@@ -66,7 +66,7 @@ describe("App Integration Tests", () => {
       RABBITMQ_QUEUE: testQueue,
     };
 
-    const app = await buildApp(testConfig);
+    const app = await App.build(testConfig);
 
     const runPromise = app.run();
 
@@ -77,7 +77,7 @@ describe("App Integration Tests", () => {
 
     expect(response).toMatchObject({
       status: "success",
-      received: request,
+      data: request,
     });
     expect(response).toHaveProperty("processedAt");
 
@@ -93,7 +93,7 @@ describe("App Integration Tests", () => {
       RABBITMQ_QUEUE: testQueue,
     };
 
-    const app = await buildApp(testConfig);
+    const app = await App.build(testConfig);
 
     const runPromise = app.run();
 
@@ -114,7 +114,7 @@ describe("App Integration Tests", () => {
     for (let i = 0; i < 3; i++) {
       expect(responses[i]).toMatchObject({
         status: "success",
-        received: requests[i],
+        data: requests[i],
       });
     }
 
@@ -130,7 +130,7 @@ describe("App Integration Tests", () => {
       RABBITMQ_QUEUE: testQueue,
     };
 
-    const app = await buildApp(testConfig);
+    const app = await App.build(testConfig);
 
     const runPromise = app.run();
 
@@ -152,7 +152,7 @@ describe("App Integration Tests", () => {
 
     expect(response).toMatchObject({
       status: "success",
-      received: request,
+      data: request,
     });
 
     await stopPromise;
